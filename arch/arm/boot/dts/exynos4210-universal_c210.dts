@@ -409,6 +409,11 @@
 		};
 	};
 
+	display-subsystem {
+		compatible = "samsung,exynos-display-subsystem";
+		ports = <&fimd>;
+	};
+
 	pwm@139D0000 {
 		compatible = "samsung,s5p6440-pwm";
 		status = "okay";
