@@ -414,6 +414,11 @@
 		status = "okay";
 	};
 
+	display-subsystem {
+		compatible = "samsung,exynos-display-subsystem";
+		ports = <&fimd>, <&dsi_0>;
+	};
+
 	camera {
 		pinctrl-names = "default";
 		pinctrl-0 = <>;
