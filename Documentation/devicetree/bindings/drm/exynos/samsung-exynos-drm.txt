@@ -1,0 +1,32 @@
+Samsung Exynos DRM master device
+================================
+
+The Samsung Exynos DRM master device is a virtual device needed to list all
+display controller, image enhancer, and display interface nodes that comprise
+the graphics subsystem.
+
+Required properties:
+- compatible: Should be "samsung,exynos-display-subsystem"
+- ports: Should contain a list of phandles pointing to display controller,
+  image enhancer, and display interface ports.
+
+Examples:
+
+In case of using MIPI-DSI,
+display-subsystem {
+	compatible = "samsung,exynos-display-subsystem";
+	ports = <&fimd>, <&dsi>;
+};
+
+
+In case of using DisplayPort,
+display-subsystem {
+	compatible = "samsung,exynos-display-subsystem";
+	ports = <&fimd>, <&dp>;
+};
+
+In case of using parallel panel,
+display-subsystem {
+	compatible = "samsung,exynos-display-subsystem";
+	ports = <&fimd>;
+};
