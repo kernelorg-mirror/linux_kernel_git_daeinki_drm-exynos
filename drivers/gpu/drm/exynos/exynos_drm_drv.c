@@ -508,56 +508,56 @@ static int exynos_drm_platform_probe(struct platform_device *pdev)
 #ifdef CONFIG_DRM_EXYNOS_DSI
 	ret = platform_driver_register(&dsi_driver);
 	if (ret < 0)
-		goto out_dsi;
+		goto err_unregister_dp;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_FIMD
 	ret = platform_driver_register(&fimd_driver);
 	if (ret < 0)
-		goto out_fimd;
+		goto err_unregister_dsi;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_HDMI
 	ret = platform_driver_register(&hdmi_driver);
 	if (ret < 0)
-		goto out_hdmi;
+		goto err_unregister_fimd;
 	ret = platform_driver_register(&mixer_driver);
 	if (ret < 0)
-		goto out_mixer;
+		goto err_unregister_hdmi;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_G2D
 	ret = platform_driver_register(&g2d_driver);
 	if (ret < 0)
-		goto out_g2d;
+		goto err_unregister_mixer;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_FIMC
 	ret = platform_driver_register(&fimc_driver);
 	if (ret < 0)
-		goto out_fimc;
+		goto err_unregister_g2d;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_ROTATOR
 	ret = platform_driver_register(&rotator_driver);
 	if (ret < 0)
-		goto out_rotator;
+		goto err_unregister_fimc;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_GSC
 	ret = platform_driver_register(&gsc_driver);
 	if (ret < 0)
-		goto out_gsc;
+		goto err_unregister_rotator;
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_IPP
 	ret = platform_driver_register(&ipp_driver);
 	if (ret < 0)
-		goto out_ipp;
+		goto err_unregister_gsc;
 
 	ret = exynos_platform_device_ipp_register();
 	if (ret < 0)
-		goto out_ipp_dev;
+		goto err_unregister_ipp;
 #endif
 
 	ret = component_master_add(&pdev->dev, &exynos_drm_ops);
@@ -568,46 +568,46 @@ static int exynos_drm_platform_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_DRM_EXYNOS_IPP
 	exynos_platform_device_ipp_unregister();
-out_ipp_dev:
+err_unregister_ipp:
 	platform_driver_unregister(&ipp_driver);
-out_ipp:
+err_unregister_gsc:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_GSC
 	platform_driver_unregister(&gsc_driver);
-out_gsc:
+err_unregister_rotator:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_ROTATOR
 	platform_driver_unregister(&rotator_driver);
-out_rotator:
+err_unregister_fimc:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_FIMC
 	platform_driver_unregister(&fimc_driver);
-out_fimc:
+err_unregister_g2d:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_G2D
 	platform_driver_unregister(&g2d_driver);
-out_g2d:
+err_unregister_mixer:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_HDMI
 	platform_driver_unregister(&mixer_driver);
-out_mixer:
+err_unregister_hdmi:
 	platform_driver_unregister(&hdmi_driver);
-out_hdmi:
+err_unregister_fimd:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_FIMD
 	platform_driver_unregister(&fimd_driver);
-out_fimd:
+err_unregister_dsi:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_DSI
 	platform_driver_unregister(&dsi_driver);
-out_dsi:
+err_unregister_dp:
 #endif
 
 #ifdef CONFIG_DRM_EXYNOS_DP
