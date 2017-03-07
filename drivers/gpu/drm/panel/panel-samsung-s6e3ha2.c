@@ -17,6 +17,7 @@
 #include <linux/backlight.h>
 #include <linux/gpio/consumer.h>
 #include <linux/regulator/consumer.h>
+#include <linux/of_device.h>
 
 #define S6E3HA2_MIN_BRIGHTNESS		0
 #define S6E3HA2_MAX_BRIGHTNESS		100
@@ -218,6 +219,14 @@ unsigned char vint_table[S6E3HA2_VINT_STATUS_MAX] = {
 	0x1d, 0x1e, 0x1f, 0x20, 0x21
 };
 
+struct s6e3ha2_drv_data {
+	unsigned int edge;
+};
+
+static struct s6e3ha2_drv_data edge_driver_data = {
+	.edge = 1
+};
+
 struct s6e3ha2 {
 	struct device *dev;
 	struct drm_panel panel;
@@ -226,6 +235,8 @@ struct s6e3ha2 {
 	struct regulator_bulk_data supplies[2];
 	struct gpio_desc *reset_gpio;
 	struct gpio_desc *enable_gpio;
+
+	const struct s6e3ha2_drv_data *driver_data;
 };
 
 static int s6e3ha2_dcs_write(struct s6e3ha2 *ctx, const void *data, size_t len)
@@ -597,16 +608,37 @@ static const struct drm_display_mode default_mode = {
 	.flags = 0,
 };
 
+static const struct drm_display_mode edge_mode = {
+	.clock = 247855,
+	.hdisplay = 1600,
+	.hsync_start = 1600 + 1,
+	.hsync_end = 1600 + 1 + 1,
+	.htotal = 1600 + 1 + 1 + 1,
+	.vdisplay = 2560,
+	.vsync_start = 2560 + 1,
+	.vsync_end = 2560 + 1 + 1,
+	.vtotal = 2560 + 1 + 1 + 15,
+	.vrefresh = 60,
+	.flags = 0,
+};
+
 static int s6e3ha2_get_modes(struct drm_panel *panel)
 {
+	struct s6e3ha2 *ctx = container_of(panel, struct s6e3ha2, panel);
 	struct drm_connector *connector = panel->connector;
-	struct drm_display_mode *mode;
+	struct drm_display_mode *mode, *cur_mode;
+	const struct s6e3ha2_drv_data *drv_data = ctx->driver_data;
 
-	mode = drm_mode_duplicate(panel->drm, &default_mode);
+	cur_mode = (struct drm_display_mode *)&default_mode;
+
+	if (drv_data && drv_data->edge)
+		cur_mode = (struct drm_display_mode *)&edge_mode;
+
+	mode = drm_mode_duplicate(panel->drm, cur_mode);
 	if (!mode) {
 		DRM_ERROR("failed to add mode %ux%ux@%u\n",
-				default_mode.hdisplay, default_mode.vdisplay,
-				default_mode.vrefresh);
+				cur_mode->hdisplay, cur_mode->vdisplay,
+				cur_mode->vrefresh);
 		return -ENOMEM;
 	}
 
@@ -642,6 +674,7 @@ static int s6e3ha2_probe(struct mipi_dsi_device *dsi)
 	mipi_dsi_set_drvdata(dsi, ctx);
 
 	ctx->dev = dev;
+	ctx->driver_data = of_device_get_match_data(dev);
 
 	dsi->lanes = 4;
 	dsi->format = MIPI_DSI_FMT_RGB888;
@@ -718,6 +751,10 @@ static int s6e3ha2_remove(struct mipi_dsi_device *dsi)
 
 static const struct of_device_id s6e3ha2_of_match[] = {
 	{ .compatible = "samsung,s6e3ha2" },
+	{
+		.compatible = "samsung,s6e3ha2-e",
+		.data = &edge_driver_data
+	},
 	{ }
 };
 MODULE_DEVICE_TABLE(of, s6e3ha2_of_match);
