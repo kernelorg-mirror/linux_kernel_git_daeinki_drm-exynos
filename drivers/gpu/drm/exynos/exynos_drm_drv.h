@@ -154,13 +154,6 @@ struct exynos_drm_clk {
  *
  * @base: crtc object.
  * @type: one of EXYNOS_DISPLAY_TYPE_LCD and HDMI.
- * @pipe: a crtc index created at load() with a new crtc object creation
- *	and the crtc object would be set to private->crtc array
- *	to get a crtc object corresponding to this pipe from private->crtc
- *	array when irq interrupt occurred. the reason of using this pipe is that
- *	drm framework doesn't support multiple irq yet.
- *	we can refer to the crtc to current hardware interrupt occurred through
- *	this pipe value.
  * @enabled: if the crtc is enabled or not
  * @event: vblank event that is currently queued for flip
  * @wait_update: wait all pending planes updates to finish
@@ -171,7 +164,6 @@ struct exynos_drm_clk {
 struct exynos_drm_crtc {
 	struct drm_crtc			base;
 	enum exynos_drm_output_type	type;
-	unsigned int			pipe;
 	const struct exynos_drm_crtc_ops	*ops;
 	void				*ctx;
 	struct exynos_drm_clk		*pipe_clk;
