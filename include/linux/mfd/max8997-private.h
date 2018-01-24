@@ -231,8 +231,8 @@ enum max8997_muic_reg {
 						| (2 << COMN1SW_SHIFT))
 #define CONTROL1_SW_UART		((3 << COMP2SW_SHIFT) \
 						| (3 << COMN1SW_SHIFT))
-#define CONTROL1_SW_OPEN		((0 << COMP2SW_SHIFT) \
-						| (0 << COMN1SW_SHIFT))
+#define CONTROL1_SW_OPEN		((3 << COMP2SW_SHIFT) \
+						| (3 << COMN1SW_SHIFT))
 
 #define CONTROL2_LOWPWR_SHIFT		(0)
 #define CONTROL2_ADCEN_SHIFT		(1)
