@@ -372,8 +372,10 @@ static int scaler_commit(struct exynos_drm_ipp *ipp,
 	if (ret < 0)
 		return ret;
 
-	if (scaler_reset(scaler))
+	if (scaler_reset(scaler)) {
+		pm_runtime_put(scaler->dev);
 		return -EIO;
+	}
 
 	scaler->task = task;
 
