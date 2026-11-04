@@ -174,12 +174,15 @@ static int exynos_dpi_parse_dt(struct exynos_dpi *ctx)
 		of_node_put(np);
 
 		vm = devm_kzalloc(dev, sizeof(*ctx->vm), GFP_KERNEL);
-		if (!vm)
+		if (!vm) {
+			of_node_put(ctx->panel_node);
 			return -ENOMEM;
+		}
 
 		ret = of_get_videomode(dn, vm, 0);
 		if (ret < 0) {
 			devm_kfree(dev, vm);
+			of_node_put(ctx->panel_node);
 			return ret;
 		}
 
@@ -241,6 +244,8 @@ struct drm_encoder *exynos_dpi_probe(struct device *dev)
 
 	if (ctx->panel_node) {
 		ctx->panel = of_drm_find_panel(ctx->panel_node);
+		of_node_put(ctx->panel_node);
+		ctx->panel_node = NULL;
 		if (IS_ERR(ctx->panel))
 			return ERR_CAST(ctx->panel);
 	}
